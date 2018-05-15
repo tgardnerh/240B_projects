@@ -1,0 +1,108 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\setlength{\parindent}{0pt}
+\usepackage{amsfonts, amsmath, amssymb, fancyvrb}
+
+\begin{document}
+
+ECN 240B: Assignment \#1\\
+Tyler Hoppenfield, partnered with Iwunze Ugo\\
+May 15, 2018\\
+\\
+\textbf{I. Estimation and Hypothesis Testing in a Binary Outcome Model}\\
+
+\textit{Consider the model,} $y_i|x_i \sim Bernoulli(\Lambda(x_i' \beta))$,\\
+where $y_i = inlf$, (female labor force particpation),\\
+and $x_i = (x_{1i}, x_{2i})' = (kidslt6, educ)'$, (number of children less than age 6, years of education)\\
+and $\Lambda(z) = \frac{exp(z)}{1 + exp(z)}$
+
+\begin{enumerate}
+\item \textit{Consider the constraint, $\beta_1 = \beta_2$}
+
+Given $y_i$ above, the probability mass function is given by $p(y_i | x_i ; \beta) = (\Lambda(x_i' \beta))^{y_i} (1 - \Lambda(x_i' \beta))^{(1 - y_i)}$ and so the log-likelihood, our objective function is given by (in the unconstrained case)
+\[ \ell (\beta ; y_i, x_i) = \sum_{i = 1}^{n} \log p(y_i | x_i ; \beta) = \sum_{i=1}^{n} y_i \log \Lambda(x_{1i} \beta_1 + x_{2i} \beta_2) + (1 - y_i) \log (1 - \Lambda(x_{1i} \beta_1 + x_{2i} \beta_2)) \]
+
+In the constrained case, we have
+\[ \ell (\beta_R ; y_i, x_i) = \sum_{i=1}^{n} y_i \log \Lambda(\beta_1 (x_{1i} + x_{2i})) + (1 - y_i) \log (1 - \Lambda(\beta_1 (x_{1i} + x_{2i})) \]
+
+The results from the estimates from the unconstrained and the constrained model are included in the attached log file. In the unconstrained case, the coefficients for \textit{kidslt6} and \textit{educ} were -0.956 and 0.046, respectively. Their standard errors were 0.159 and 0.007. In the constrained case, we have a single coefficient to estimate, $\hat{\beta}_1$, whose coefficient and standard error were 0.025 and 0.006.
+
+The standard error for the constrained case is lower than the standard errors in the unconstrained case for either of the two variables. We could have expected this result just from looking at the form of the asymptotic variance for both the unconstrained and the constrained case. As in Problem Set 2, we have
+
+\[ \hat{Avar} (\hat{\beta}) = \left \{ \sum_{i=1}^{n} (y_i - \Lambda (x_{1i} \hat{\beta}_1 + x_{2i} \hat{\beta}_2))^2 \begin{pmatrix} x_{1i}^2 & x_{1i} x_{2i} \\ x_{1i} x_{2i} & x_{2i}^2 \end{pmatrix} \right \}^{-1} \]
+
+While in the constrained case, the asymptotic variance is given by
+
+\[ \hat{Avar} (\hat{\beta_R}) = \left \{ \sum_{i=1}^{n} (y_i - \Lambda (\hat{\beta}_1(x_{1i} + x_{2i})))^2 (x_{1i} + x_{2i})^2 \right \}^{-1} \]
+
+Since the standard error of the estimate is given by taking the square root of any element on the diagonal of $\hat{Avar} (\hat{\beta})$ in the unconstrained case and the just the square root of $\hat{Avar} (\hat{\beta_R})$ in the constrained case. The comparison of the standard errors comes down to the comparison of $\hat{\beta}_2$ to $\hat{\beta}_1$ and of $x_{1i}$ or $x_{2i}$ to $(x_{1i} + x_{2i})$. If $|\hat{\beta}_1| > |\hat{\beta}_2|$ and $(x_{1i} + x_{2i}) \geq max\{x_{1i}, x_{2i}\}$, then the standard error of the estimate in the constrained regression would be lower than the standard error of the estimates for either of the independent variables.
+
+The second inequality is clear from the fact that both variables, $x_i = (x_{1i}, x_{2i})' = (kidslt6, educ)'$, are nonnegative. For the first equality, one could reasonably expect that the marginal effect on the likelihood of labor force participation would be stronger (greater in absolute value) from an additional young child than from the marginal effect of an additional year of education.
+
+\item \textit{Explain what ``Iteration 0, Iteration 1, ..." refers to in the STATA output}
+
+In general, maximization of the log-likelihood function does not produce a closed form solution for the estimand, $\beta$. Since we can't use constrained optimization to find an estimate of the parameter of interest, we rely on numerical methods instead. The iterations here refer to the process STATA uses of guessing some initial value of $\beta$, then using that value as the basis of a better guess, and repeating the process until the better guess is sufficiently close to the prior guess. When the iterative process no longer meaningfully improves the guess, we stop the process and argue that the last guess is the true maximizer of the objective function. One form of such an iterative process is the Newton-Raphson method, which relies on a first order Taylor expansion to form the basis of the iterations.
+
+\item \textit{Consider various hypotheses}
+
+\begin{enumerate}
+\item \textit{Wald test of $H_0: \beta_1 + \beta_2 = 1$}
+
+The Wald test statistic comes out to be 149.12. The critical value for a $\chi_1^2$ distribution at the 5\% level is 3.841, so we reject the null hypothesis.
+
+\item \textit{Likelihood ratio test of $H_0: c(\theta_0) = 0$}
+
+In order to run a likelihood ratio test for a general constraint, $H_0: c(\theta) = 0$, we would compute the test statistic
+
+\[ LR = -2 (\ell(\hat{\theta}_R) - \ell(\hat{\theta})) \stackrel{d}{\to} \chi_q^2 \text{ , under } H_0\]
+
+Where $q$ is the number of constraints, and $\hat{\theta}_R$ is the constrained parameter vector.
+
+\item \textit{Likelihood ratio test of $H_0: \beta_1 = \beta_2$}
+
+From the estimation results in (1), we have that the log-likelihood of the constrained model is -512.396 and that the log-likelihood of the unconstrained model is -490.560. Then, our test statistic is -2(-512.396 - (-490.560)) = 43.672. The critical value for a $\chi_1^2$ distribution at the 5\% level is 3.841. We reject the null hypothesis that $\beta_1 = \beta_2$. The STATA command, \textit{lrtest} gives the same result.
+
+\item \textit{Wald test of $H_0: \beta_1 = \beta_2$}
+
+The Wald test statistic comes out to be 38.16. The critical value for a $\chi_1^2$ distribution at the 5\% level is 3.841, so we reject the null hypothesis.
+
+\end{enumerate}
+
+\end{enumerate}
+
+\textbf{II. Simulation Exercise for a Probit Model}\\
+
+
+\begin{enumerate}
+\item
+\begin{Verbatim}
+
+outcomes_tab[10,7]
+  N      beta_0    bias_bar         SSD      SE/SSD    p_bar_05    p_bar_10
+100       .0025   .00118848   .03893559   .57745304        .252        .342
+100         .25  -.10358018   .02993093   .64992836        .997        .999
+100          .1  -.03812346   .03752608     .585992        .694        .754
+500       .0005   -.0010906   .01679778   .60083441        .245        .331
+500         .25  -.10394732    .0134665   .64703811           1           1
+500          .1  -.03661879   .01618765   .60784117        .996        .999
+1000      .00025    .0000813   .01170271   .60953392        .234        .311
+1000         .25   -.1041685   .00957513    .6449299           1           1
+1000          .1  -.03692031    .0116846   .59471239           1           1
+
+\end{Verbatim}
+
+\item The simulation average of $\hat{\beta} -\beta_0 $ (labled "bias-bar"), or the gap between my estimate of expected $\hat{\beta}$ and the underlying $\beta_0$, approaches zero as sample size increases.  This suggests that as n approaches infinity, $\hat{\beta}$ approaches $\beta_0$.
+\item The estimator of the variance of $\sqrt{n}(\hat{\beta^s}-\beta_0)$ is... 
+The approximately constant value of the SE/SSD statistic, even at a small $n$, suggests that this estimator shows good finite-sample properties
+
+\item We could illustrate asymptotic normality by also calculating the higher moments of $\hat{\beta}}$ in the simulation
+
+\item the SE/SSD statistic, and the fact that is is more or less constant across all simulations, shows that the t statistic controls size in these finite sample simulations
+\item the increase of p_bar_5 and p_bar_10 as $n$ increases for the $\beta_0 = .25$ and $\beta_0 = .1$ simulations shows that the test has power against a fixed alternative
+\item the constant value across $n$ of  p_bar_5 and p_bar_10 for the alternative of $H_0 = .25/n$ shows that the test has power against a local alternative.
+
+\end{enumerate}
+
+
+\end{document}
