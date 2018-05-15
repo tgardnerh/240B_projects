@@ -77,7 +77,7 @@ foreach n of numlist `n_values' {
 		//SSD
 		generate u_hat_square = (beta_hat - `beta_hat_bar')^2
 		sum u_hat_square 
-		local SSD = `r(mean)'
+		local SSD = sqrt(`r(mean)')
 
 		//SE/SSD
 		sum beta_SE
